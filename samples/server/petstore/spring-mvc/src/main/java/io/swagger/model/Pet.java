@@ -1,24 +1,33 @@
 package io.swagger.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.model.Category;
 import io.swagger.model.Tag;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.wordnik.swagger.annotations.*;
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 
 @ApiModel(description = "")
+@javax.annotation.Generated(value = "class io.swagger.codegen.languages.SpringMVCServerCodegen", date = "2016-02-26T13:58:54.483Z")
 public class Pet  {
   
   private Long id = null;
   private Category category = null;
   private String name = null;
-  private List<String> photoUrls = new ArrayList<String>() ;
-  private List<Tag> tags = new ArrayList<Tag>() ;
+  private List<String> photoUrls = new ArrayList<String>();
+  private List<Tag> tags = new ArrayList<Tag>();
   public enum StatusEnum {
      available,  pending,  sold, 
   };
+  
   private StatusEnum status = null;
 
   
@@ -95,6 +104,28 @@ public class Pet  {
   }
 
   
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Pet pet = (Pet) o;
+    return Objects.equals(id, pet.id) &&
+        Objects.equals(category, pet.category) &&
+        Objects.equals(name, pet.name) &&
+        Objects.equals(photoUrls, pet.photoUrls) &&
+        Objects.equals(tags, pet.tags) &&
+        Objects.equals(status, pet.status);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, category, name, photoUrls, tags, status);
+  }
 
   @Override
   public String toString()  {

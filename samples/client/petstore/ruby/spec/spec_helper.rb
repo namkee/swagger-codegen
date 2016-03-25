@@ -1,16 +1,11 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'monkey'
-require 'swagger'
+require 'petstore'
 require 'vcr'
 require 'typhoeus'
 require 'json'
 require 'yaml'
 require 'rspec'
-
-Dir[File.join(File.dirname(__FILE__), "../lib/*.rb")].each {|file| require file }
-Dir[File.join(File.dirname(__FILE__), "../models/*.rb")].each {|file| require file }
-Dir[File.join(File.dirname(__FILE__), "../resources/*.rb")].each {|file| require file }
 
 RSpec.configure do |config|
   # some (optional) config here
@@ -33,26 +28,44 @@ def help
   exit
 end
 
+# no longer reading credentials (not used) from file (20150413)
 # Parse ~/.swagger.yml for user credentials
-begin
-  CREDENTIALS = YAML::load_file(File.join(ENV['HOME'], ".swagger.yml")).symbolize_keys
-rescue
-  help
+#begin
+#  CREDENTIALS = YAML::load_file(File.join(ENV['HOME'], ".swagger.yml")).symbolize_keys
+#rescue
+#  help
+#end
+
+API_CLIENT = Petstore::ApiClient.new(Petstore::Configuration.new)
+
+def random_id
+  rand(1000000) + 20000
 end
 
-def configure_swagger
-  Swagger.configure do |config|
-    config.api_key = "special-key"
-    config.username = ""
-    config.password = ""
-
-    config.host = 'petstore.swagger.wordnik.com'
-    config.base_path = '/api'
-  end
+# create a random pet, return its id
+def prepare_pet(pet_api)
+  pet_id = random_id
+  category = Petstore::Category.new('id' => 20002, 'name' => 'category test')
+  tag = Petstore::Tag.new('id' => 30002, 'name' => 'tag test')
+  pet = Petstore::Pet.new('id' => pet_id, 'name' => "RUBY UNIT TESTING", 'photo_urls' => 'photo url',
+                          'category' => category, 'tags' => [tag], 'status' => 'pending')
+  pet_api.add_pet(:'body'=> pet)
+  return pet_id
 end
 
-configure_swagger
+# create a random order, return its id
+def prepare_store(store_api)
+  order_id = random_id
+  order = Petstore::Order.new("id" => order_id,
+		  "petId" => 123,
+		  "quantity" => 789,
+		  "shipDate" => "2015-04-06T23:42:01.678Z",
+		  "status" => "placed",
+		  "complete" => false)
+  store_api.place_order(:body => order)
+  return order_id
+end
 
-# A random string to tack onto stuff to ensure we're not seeing 
+# A random string to tack onto stuff to ensure we're not seeing
 # data from a previous test run
 RAND = ("a".."z").to_a.sample(8).join
